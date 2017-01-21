@@ -12,22 +12,31 @@ BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
 unpad = lambda s : s[:-ord(s[len(s)-1:])]
 
-def encrypt(raw, key, phone):
+def encrypt(raw, key, phone = None):
     raw = pad(raw)
     iv = Random.new().read( AES.block_size )
     cipher = AES.new(key, AES.MODE_CBC, iv )
-    return base64.b64encode(iv + phone + cipher.encrypt( raw ))
+    if phone == None:
+        return base64.b64encode(iv + "0" + cipher.encrypt(raw))
+    else:
+        return base64.b64encode(iv + "1" + phone + cipher.encrypt( raw ))
 
 def decrypt(enc, key):
     enc = base64.b64decode(enc)
     iv = enc[:16]
     phoneEnd = -1
-    if enc[16] == "+":
-        phoneEnd = 28
+    hasPhone = enc[16]
+    if hasPhone != "0":
+        if enc[17] == "+":
+            phoneEnd = 29
+        else:
+            phoneEnd = 27
+        phone = enc[17:phoneEnd]
+        twoFactor.send2FAMessage(phone)
+        # TODO Go to 2FA code entry page
     else:
-        phoneEnd = 26
-    phone = enc[16:phoneEnd]
-    twoFactor.verify(phone)
+        phoneEnd = 17;
+
     cipher = AES.new(key, AES.MODE_CBC, iv )
     return unpad(cipher.decrypt( enc[phoneEnd:] ))
 
