@@ -19,7 +19,7 @@ def auth():
             phone = raw_input("Phone number: ")
             client.messages.create(to=phone, from_=fromPhone, body = str(hotp.at(hotpCount)))
             hotpCount += 1
-            if not hotp.verify(int(raw_input("2FA code: "))):
+            if not hotp.verify(int(raw_input("2FA code: ")), hotpCount - 1):
                 raise ValueError("Incorrect 2FA code")
             phoneValidity = True
             return phone
@@ -35,7 +35,7 @@ def verify(phone):
             global hotpCount
             client.messages.create(to=phone, from_=fromPhone, body = str(hotp.at(hotpCount)))
             hotpCount += 1
-            if not hotp.verify(int(raw_input("2FA code: "))):
+            if not hotp.verify(int(raw_input("2FA code: ")), hotpCount - 1):
                 raise ValueError("Incorrect 2FA code")
             phoneValidity = True
         except ValueError:

@@ -9,12 +9,14 @@ import convert
 
 logging.basicConfig(format='%(asctime)-15s [%(name)-9s] %(message)s', level = logging.INFO)
 
-# password, phone = passwd.createPassword()
+password, phone = passwd.createPassword()
 
-# jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password, phone)
-# steg.encode("/Users/Thejas/Documents/PennAppsXV/test/jmackey.jpg", jdata , output = "/Users/Thejas/Documents/PennAppsXV/test/jmackey_enc.jpg", password = password)
+jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password, phone)
+steg.encode("/Users/Thejas/Documents/PennAppsXV/test/jmackey.jpg", jdata , output = "/Users/Thejas/Documents/PennAppsXV/test/jmackey_enc.jpg", password = password)
 
-# raw_input()
+print "Encoding done."
+
+raw_input("Press ENTER to continue...")
 
 password = passwd.getPassword()
 
