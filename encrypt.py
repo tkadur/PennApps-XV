@@ -1,5 +1,12 @@
 import requests
 import json
+import pyotp
+import string
+#import cStringIO
+from steg import steg
+from auth import password as passwd
+from auth import twoFactor
+import convert
 from flask import Flask, flash, redirect, render_template, request, session, abort
 
 app = Flask(__name__)
@@ -9,10 +16,22 @@ app.secret_key = "super secret key"
 
 @app.route('/')
 def home():
+  return render_template('index.html')
+'''def home():
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
     return render_template('home.html')
+'''
+
+@app.route('/option', methods=['POST'])
+def option():
+  if request.method == 'POST':
+    if 'store' in request.form:
+      return render_template('create_account.html')
+    else:
+      return render_template('login.html')
+  return home()
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -39,13 +58,10 @@ def create_account():
     flash('You have created an account')
     info = create(makeAccount(request.form['first name'], request.form['last name'], request.form['street number'], request.form['street name'], request.form['city'], request.form['state'], request.form['zipcode']))
     print(info)
-    return home()
+    return render_template("home.html")
 
 @app.route("/logout", methods=['GET', 'POST'])
 def logout():
-  #if request.method == 'POST':
-  #print(request.form)
-  print("meow")
   session['logged_in'] = False
   return home()
 
