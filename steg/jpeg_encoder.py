@@ -1,4 +1,4 @@
-import Image
+from PIL import Image
 import math
 import operator
 import logging
@@ -48,14 +48,14 @@ class JpegInfo(object):
 
     def down_sample(self, C, comp):
         def cal_result(inrow, incol, bias):
-            return sum([C[inrow][incol], 
+            return sum([C[inrow][incol],
                     C[inrow][incol+1],
                     C[inrow+1][incol],
                     C[inrow+1][incol+1],
                     bias]) / 4.0
 
         return [[cal_result(outrow << 1, outcol << 1, outcol % 2 + 1)
-                for outcol in range(self.comp_width[comp])] 
+                for outcol in range(self.comp_width[comp])]
                 for outrow in range(self.comp_height[comp])]
 
     def get_ycc_array(self):
@@ -130,8 +130,8 @@ class JpegEncoder(object):
         SOI = [0xff, 0xD8]
         self.write_marker(SOI)
 
-        JFIF = [0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 
-                0x49, 0x46, 0x00, 0x01, 0x01, 0x01, 
+        JFIF = [0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46,
+                0x49, 0x46, 0x00, 0x01, 0x01, 0x01,
                 0x00, 0x60, 0x00, 0x60, 0x00, 0x00]
         self.write_array(JFIF)
 
@@ -148,19 +148,19 @@ class JpegEncoder(object):
             DQT.extend([self.dct.quantum[k][JPEG_NATURAL_ORDER[i]] for i in range(64)])
         self.write_array(DQT)
 
-        SOF = [0xff, 0xc0, 0x00, 0x11, 
-                self.jpeg_obj.precision, 
-                self.jpeg_obj.image_height >> 8 & 0xff, 
-                self.jpeg_obj.image_height & 0xff, 
-                self.jpeg_obj.image_width >> 8 & 0xff, 
-                self.jpeg_obj.image_width & 0xff, 
+        SOF = [0xff, 0xc0, 0x00, 0x11,
+                self.jpeg_obj.precision,
+                self.jpeg_obj.image_height >> 8 & 0xff,
+                self.jpeg_obj.image_height & 0xff,
+                self.jpeg_obj.image_width >> 8 & 0xff,
+                self.jpeg_obj.image_width & 0xff,
                 self.jpeg_obj.comp_num]
         for i in range(self.jpeg_obj.comp_num):
             SOF.append(self.jpeg_obj.com_id[i])
             SOF.append(eight_byte(self.jpeg_obj.hsamp_factor[i], self.jpeg_obj.vsamp_factor[i]))
             SOF.append(self.jpeg_obj.qtable_number[i])
         self.write_array(SOF)
-        
+
         DHT = [0xff, 0xc4, 0, 0]
         for i in range(4):
             DHT.extend(self.huf.BITS[i])
@@ -206,7 +206,7 @@ class JpegEncoder(object):
                                     dct_array1[a][b] = indata[min(ia+a, maxa)][min(ib+b, maxb)]
 
                             dct_array2 = self.dct.forward_dct(dct_array1)
-                            dct_array3 = self.dct.quantize_block(dct_array2, 
+                            dct_array3 = self.dct.quantize_block(dct_array2,
                                     self.jpeg_obj.qtable_number[comp])
                             coeff.extend(dct_array3[:64])
         return coeff
@@ -393,5 +393,5 @@ class JpegEncoder(object):
                                     self.jpeg_obj.dctable_number[comp], self.jpeg_obj.actable_number[comp])
                             last_dc_value[comp] = dct_array3[0]
                             shuffled_index += 64
-        
+
         self.huf.flush_buffer(self.out)
