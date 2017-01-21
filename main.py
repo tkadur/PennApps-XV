@@ -1,22 +1,25 @@
-import pyotp
 import string
 import json
 import cStringIO
+import logging
 
 from steg import steg
 from auth import password as passwd
-from auth import twoFactor
 import convert
 
-password, phone = passwd.createPassword()
+logging.basicConfig(format='%(asctime)-15s [%(name)-9s] %(message)s', level = logging.INFO)
 
-jdata = passwd.encrypt(convert.csv2JSON("test/SuperSecretInformation.csv"), password, phone)
-steg.encode("/Users/Thejas/Documents/PennAppsXV/test/jmackey.jpg", jdata , output = "/Users/Thejas/Documents/PennAppsXV/test/jmackey_enc.jpg", password = password)
+# password, phone = passwd.createPassword()
+
+# jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password, phone)
+# steg.encode("/Users/Thejas/Documents/PennAppsXV/test/jmackey.jpg", jdata , output = "/Users/Thejas/Documents/PennAppsXV/test/jmackey_enc.jpg", password = password)
+
+# raw_input()
 
 password = passwd.getPassword()
 
 decodeOut = cStringIO.StringIO()
 steg.decode("/Users/Thejas/Documents/PennAppsXV/test/jmackey_enc.jpg", decodeOut, password)
-print passwd.decrypt(decodeOut.getvalue(), password, phone)
+print passwd.decrypt(decodeOut.getvalue(), password)
 
 decodeOut.close()

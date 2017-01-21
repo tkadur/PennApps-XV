@@ -18,7 +18,7 @@ def encrypt(raw, key, phone):
     cipher = AES.new(key, AES.MODE_CBC, iv )
     return base64.b64encode(iv + phone + cipher.encrypt( raw ))
 
-def decrypt(enc, key, phone):
+def decrypt(enc, key):
     enc = base64.b64decode(enc)
     iv = enc[:16]
     phoneEnd = -1

@@ -6,15 +6,20 @@ import pyotp
 client = TwilioRestClient("AC8c4c8d09c7b00f35327b3beaeee7fc28", "d2f2da9faf52d27ee43083a37724a5fc")
 
 fromPhone = "+17323749050"
-totp = pyotp.TOTP(pyotp.random_base32())
+hotp = pyotp.HOTP(pyotp.random_base32())
+hotpCount = 1
 
 def auth():
     phoneValidity = False
     while not phoneValidity:
         try:
+            # Why tf does this need to be global?
+            # IDK, but Python dies if it's not
+            global hotpCount
             phone = raw_input("Phone number: ")
-            client.messages.create(to=phone, from_=fromPhone, body = str(totp.now()))
-            if not totp.verify(int(raw_input("2FA code: "))):
+            client.messages.create(to=phone, from_=fromPhone, body = str(hotp.at(hotpCount)))
+            hotpCount += 1
+            if not hotp.verify(int(raw_input("2FA code: "))):
                 raise ValueError("Incorrect 2FA code")
             phoneValidity = True
             return phone
@@ -27,9 +32,11 @@ def verify(phone):
     phoneValidity = False
     while not phoneValidity:
         try:
-            client.messages.create(to=phone, from_=fromPhone, body = str(totp.now()))
-            if not totp.verify(int(raw_input("2FA code: "))):
+            global hotpCount
+            client.messages.create(to=phone, from_=fromPhone, body = str(hotp.at(hotpCount)))
+            hotpCount += 1
+            if not hotp.verify(int(raw_input("2FA code: "))):
                 raise ValueError("Incorrect 2FA code")
             phoneValidity = True
         except ValueError:
-            print "The 2FA code you entered was not valid. Please try again. If you wish to use the same phone number, simply leave that field blank."
+            print "The 2FA code you entered was not valid. Please try again."

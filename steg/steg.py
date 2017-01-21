@@ -6,7 +6,6 @@ from jpeg_extract import JpegExtract
 import logging
 
 def encode(input, data, output = 'output.jpg', password = 'correcthorsebatterystaple', comment = 'PennApps XV', quality = 100):
-    logging.basicConfig(format='%(asctime)-15s [%(name)-9s] %(message)s', level = logging.INFO)
     image = Image.open(input)
 
     output = open(output, 'wb')
