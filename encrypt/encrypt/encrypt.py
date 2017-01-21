@@ -12,7 +12,7 @@ def home():
   if not session.get('logged_in'):
     return render_template('login.html')
   else:
-    return "Hello Boss!"
+    return render_template('home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -40,6 +40,14 @@ def create_account():
     info = create(makeAccount(request.form['first name'], request.form['last name'], request.form['street number'], request.form['street name'], request.form['city'], request.form['state'], request.form['zipcode']))
     print(info)
     return home()
+
+@app.route("/logout", methods=['GET', 'POST'])
+def logout():
+  #if request.method == 'POST':
+  #print(request.form)
+  print("meow")
+  session['logged_in'] = False
+  return home()
 
 
 #Gets specific customer account

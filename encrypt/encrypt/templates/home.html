@@ -1,0 +1,16 @@
+<link rel="stylesheet" href="/static/style.css" type="text/css">
+{% block body %}
+{% if not session['logged_in'] %}
+<p>You're not logged in!</p>
+{% else %}
+<form action="/logout" method="POST">
+<div class="login-screen">
+  <div class="login-form">
+    <div class="control-group">
+      <input type="submit" name='logout' value="Log out" class="btn btn-primary btn-large btn-block">
+    </div>
+  </div>
+</div>
+</form>
+{% endif %}
+{% endblock %}
