@@ -6,22 +6,30 @@ import os
 import getpass
 import string
 import re
+import twoFactor
 
 BS = 16
 pad = lambda s: s + (BS - len(s) % BS) * chr(BS - len(s) % BS)
 unpad = lambda s : s[:-ord(s[len(s)-1:])]
 
-def encrypt(raw, key):
+def encrypt(raw, key, phone):
     raw = pad(raw)
     iv = Random.new().read( AES.block_size )
     cipher = AES.new(key, AES.MODE_CBC, iv )
-    return base64.b64encode(iv + cipher.encrypt( raw ))
+    return base64.b64encode(iv + phone + cipher.encrypt( raw ))
 
-def decrypt(enc, key):
+def decrypt(enc, key, phone):
     enc = base64.b64decode(enc)
     iv = enc[:16]
+    phoneEnd = -1
+    if enc[16] == "+":
+        phoneEnd = 28
+    else:
+        phoneEnd = 26
+    phone = enc[16:phoneEnd]
+    twoFactor.verify(phone)
     cipher = AES.new(key, AES.MODE_CBC, iv )
-    return unpad(cipher.decrypt( enc[16:] ))
+    return unpad(cipher.decrypt( enc[phoneEnd:] ))
 
 def validatePassword(password):
     validPasswdChars = list(string.digits + string.letters + string.punctuation)
@@ -64,7 +72,7 @@ def createPassword():
         print "Passwords must be at least 5 characters and consist only of alphanumeric characters and punctuation symbols. Please try again."
         password = getpass.getpass("Please enter a new password: ")
     print "Password strength: " + str(passwordStrength(password)) + "%"
-    return hashlib.md5(password).hexdigest()
+    return hashlib.md5(password).hexdigest(), twoFactor.auth()
 
 def getPassword():
     password = getpass.getpass("Please enter your password: ")
