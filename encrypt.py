@@ -42,13 +42,14 @@ def login():
   if request.method == 'POST':
     if 'login' in request.form:
       #if request.form['accountID'] != app.config['USERNAME']:
-      if request.form['accountID'] != '':
+      if request.form['accountID'] != 'meows':
         error = 'Invalid username'
       #elif request.form['password'] != app.config['PASSWORD']:
-      elif request.form['password'] != '':
+      elif request.form['password'] != 'meows':
         error = 'Invalid password'
       else:
-        password = request.form['password']
+        global password
+        password = passwd.getPassword(request.form['password'])
         session['logged_in'] = True
         flash('You were logged in')
         return render_template('phone.html')
@@ -63,8 +64,11 @@ phone = ''
 def phone():
   error = None
   if request.method == 'POST':
+    global phone
     phone = request.form['phone']
-    twoFactor.auth(phone)
+    phone = '7184727483'
+    #twoFactor.send2FAMessage(phone)
+    return render_template('2fa.html')
   return render_template('phone.html')
 
 @app.route('/2fa', methods=['GET', 'POST'])
@@ -72,9 +76,21 @@ def code():
   error = None
   if request.method == 'POST':
     code = request.form['2fa']
-    twoFactor.auth1(code)
+    print("moomoo")
+    #twoFactor.verify(code)
+    #print(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"))
+    print(password)
     jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password, phone)
+    steg.encode("/Users/juliahou/Documents/painting.jpeg", jdata, output="/Users/juliahou/Documents/painting-enc.jpeg", password = password)
+    return render_template('download.html')
   return render_template('phone.html')
+
+@app.route('/return-files/')
+def return_files():
+  try:
+    return send_file("/Users/juliahou/Documents/painting-enc.jpeg", attachment_filename="painting-enc.jpeg")
+  except Exception as e:
+    return str(e)
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
