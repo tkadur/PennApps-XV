@@ -66,14 +66,5 @@ def passwordStrength(password):
 
     return 100 - (weaknesses * 20)
 
-def createPassword():
-    password = getpass.getpass("Please enter a new password: ")
-    while not validatePassword(password):
-        print "Passwords must be at least 5 characters and consist only of alphanumeric characters and punctuation symbols. Please try again."
-        password = getpass.getpass("Please enter a new password: ")
-    print "Password strength: " + str(passwordStrength(password)) + "%"
-    return hashlib.md5(password).hexdigest(), twoFactor.auth()
-
-def getPassword():
-    password = getpass.getpass("Please enter your password: ")
+def getPassword(password):
     return hashlib.md5(password).hexdigest()
