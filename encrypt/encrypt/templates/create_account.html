@@ -1,0 +1,57 @@
+<link rel="stylesheet" href="/static/style.css" type="text/css">
+{%block body %}
+{% if session['logged_in'] %}
+<p>You're logged in already!</p>
+{% else %}
+
+<form action="/create_account" method="POST">
+  <div class="login">
+    <div class="login-screen">
+      <div class="app-title">
+        <h1>Create Account</h1>
+      </div>
+      <div class="login-form">
+        <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="first name" name="first name">
+          <label class="login-field-icon fui-user" for="first-name"></label>
+        </div>
+
+        <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="last name" name="last name">
+          <label class="login-field-icon fui-lock" for="last-name"></label>
+        </div>
+
+         <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="street number" name="street number">
+          <label class="login-field-icon fui-lock" for="street-number"></label>
+        </div>
+
+         <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="street name" name="street name">
+          <label class="login-field-icon fui-lock" for="street-name"></label>
+        </div>
+
+        <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="city" name="city">
+          <label class="login-field-icon fui-lock" for="city"></label>
+        </div>
+
+        <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="state" name="state">
+          <label class="login-field-icon fui-lock" for="state"></label>
+        </div>
+
+        <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="zipcode" name="zipcode">
+          <label class="login-field-icon fui-lock" for="zipcode"></label>
+        </div>
+
+    <input type="submit" value="Create account" class="btn btn-primary btn-large btn-block" >
+        <br>
+      </div>
+    </div>
+  </div>
+</form>
+
+{% endif %}
+{% endblock %}
