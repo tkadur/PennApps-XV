@@ -1,0 +1,26 @@
+<link rel="stylesheet" href="/static/style.css" type="text/css">
+
+<form action="/phone" method="POST">
+  <div class="login">
+    <div class="login-screen">
+      <div class="app-title">
+        <h1>Get encryption</h1>
+      </div>
+      <div class="login-form">
+        <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="phone number" name="phone">
+          <label class="login-field-icon fui-user" for="phone"></label>
+        </div>
+
+        <input type="submit" value="Submit" class="btn btn-primary btn-large btn-block">
+      </div>
+
+      <div class="login-form">
+        <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="2FA code" name= "2fa">
+          <label class="login-field-icon fui-user" for="2fa"></label>
+        </div>
+        <input type="submit" value="submit" class="btn btn-primary btn-large btn-block">
+    </div>
+  </div>
+</form>
