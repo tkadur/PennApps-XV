@@ -24,13 +24,8 @@ def login():
       return redirect(url_for('show_entries'))
   return render_template('login.html', error=error)
 
-#Getting specific customer account
-#id = input('Please enter your account ID: ')
-#url = 'http://api.reimaginebanking.com/enterprise/accounts/' + id + '?key=89aa70192f549a177bab372469a7c78a'
 
-#response = requests.get(url, id)
-#print(response.json())
-
+#Gets specific customer account
 def getInfo(id, type):
   url = 'http://api.reimaginebanking.com/enterprise/' + type + '/' + id + '?key=89aa70192f549a177bab372469a7c78a'
   response = requests.get(url, id)
@@ -48,6 +43,7 @@ account = {
       }
     }
 
+#creates dictionary with information
 def makeAccount(first_name, last_name, street_number, street_name, city, state, zipcode):
   x = {}
   x["first_name"] = first_name
@@ -61,14 +57,14 @@ def makeAccount(first_name, last_name, street_number, street_name, city, state, 
   x["address"] = y
   return x
 
-#Creating customer
+#Creates customer
 def create(info):
   url = 'http://api.reimaginebanking.com/customers?key=89aa70192f549a177bab372469a7c78a'
   data = json.dumps(info)
   response = requests.post(url, data, headers={'content-type':'application/json'})
   return response.json()
 
-print(create(makeAccount("Daisy", "Lai", "100", "Sugar Road", "New York", "NY", "32343")))
+#print(create(makeAccount("Daisy", "Lai", "100", "Sugar Road", "New York", "NY", "32343")))
 
 if __name__ == "__main__":
   app.run()
