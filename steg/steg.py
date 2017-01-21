@@ -15,11 +15,9 @@ def encode(input, data, output = 'output.jpg', password = 'correcthorsebatteryst
     output.close()
 
 def decode(input, output, password):
-    out = sys.stdout#open(output, 'wb')
     image = open(input, 'rb')
-    JpegExtract(out, password).extract(image.read())
+    JpegExtract(output, password).extract(image.read())
 
     image.close()
-    output.close()
 
 # encode("/Users/Thejas/Documents/PennAppsXV/jmackey.jpg", "testing testing")
