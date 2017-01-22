@@ -56,7 +56,7 @@ def upload():
     filename = secure_filename(file.filename)
 
     #if allowed_file(file.filename):
-    path = '/Users/juliahou/Documents'
+    path = '~'
     global filepath
     filepath = os.path.join(path, filename)
     file.save(filepath)
@@ -101,8 +101,7 @@ def phone():
   if request.method == 'POST':
     global phone
     phone = request.form['phone']
-    phone = '7184727483'
-    #twoFactor.send2FAMessage(phone)
+    twoFactor.send2FAMessage(phone)
     return render_template('2fa.html')
   return render_template('phone.html')
 
@@ -111,9 +110,9 @@ def code():
   error = None
   if request.method == 'POST':
     code = request.form['2fa']
-    #twoFactor.verify(code)
+    twoFactor.verify(code)
     jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password, phone)
-    steg.encode("/Users/juliahou/Documents/painting.jpeg", jdata, output="/Users/juliahou/Documents/painting-enc.jpeg", password = password)
+    steg.encode("~/painting.jpeg", jdata, output="~/painting-enc.jpeg", password = password)
     return render_template('download.html')
   return render_template('phone.html')
 
@@ -121,14 +120,14 @@ def code():
 def no_code():
   if request.method == 'POST':
     jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password)
-    steg.encode("/Users/juliahou/Documents/painting.jpeg", jdata, output="/Users/juliahou/Documents/painting-enc.jpeg", password=password)
+    steg.encode("~/painting.jpeg", jdata, output="~/painting-enc.jpeg", password=password)
     return render_template('download.html')
   return render_template('phone.html')
 
 @app.route('/return-files/')
 def return_files():
   try:
-    return send_file("/Users/juliahou/Documents/painting-enc.jpeg", attachment_filename="painting-enc.jpeg")
+    return send_file("~/painting-enc.jpeg", attachment_filename="painting-enc.jpeg")
   except Exception as e:
     return str(e)
 
@@ -149,7 +148,7 @@ def retrieval():
 
     #if allowed_file(file.filename):
     filename = secure_filename(file.filename)
-    path = '/Users/juliahou/Documents'
+    path = '~'
     file.save(os.path.join(path, filename))
 
     decodeOut = cStringIO.StringIO()
@@ -173,7 +172,7 @@ def decrypt_2fa():
   error = None
   if request.method == 'POST':
     code = request.form['2fa']
-    #twoFactor.verify(code)
+    twoFactor.verify(code)
     output = open('file.txt', 'r')
     content = output.read()
     return render_template('info.html', content=content)
