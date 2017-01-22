@@ -19,10 +19,10 @@ parser = optparse.OptionParser(usage="Usage: %prog [options] [args]")
 group = optparse.OptionGroup(parser, 'Encryption and JPEG Steganography')
 
 group.add_option('-t', '--type', type='string', default='e',
-        help='e for encode or x for decode')
+        help='e for encrypt or x for decrypt')
 group.add_option('-i', '--image', type='string', help='input image')
 group.add_option('-d', '--data', type='string', help='data to be embeded, only for encode')
-group.add_option('-o', '--output', type='string', help='output image name, only for encode')
+group.add_option('-o', '--output', type='string', help='output image name')
 
 parser.add_option_group(group)
 parser.add_option('-q', '--quiet', action='store_true')
@@ -31,7 +31,7 @@ parser.add_option('-v', '--verbose', action='store_true')
 options, args = parser.parse_args()
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)-15s [%(name)-9s] %(message)s',
+    logging.basicConfig(format="%(message)s",#'%(asctime)-15s [%(name)-9s] %(message)s',
             level=options.quiet and logging.ERROR
                 or options.verbose and logging.DEBUG or logging.INFO)
     if options.image and os.path.isfile(options.image):
@@ -47,7 +47,7 @@ if __name__ == '__main__':
                 options.output = 'output.jpg'
             elif os.path.exists(options.output) and os.path.isfile(options.output):
                 print 'the output file exists, do you really want to override it?'
-                answer = raw_input('y/n: ')
+                answer = raw_input('y/N: ')
                 if answer != 'y':
                     print 'exit'
                     sys.exit(1)
@@ -79,19 +79,3 @@ if __name__ == '__main__':
     else:
         print 'you didn\'t give a image or the image is not there'
         parser.print_help()
-
-# password = passwd.getPassword("")
-
-# jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password)
-# steg.encode("/Users/Thejas/Documents/PennAppsXV/test/jmackey.jpg", jdata , output = "/Users/Thejas/Documents/PennAppsXV/test/jmackey_enc.jpg", password = password)
-
-# decodeOut = cStringIO.StringIO()
-# try:
-#     steg.decode("/Users/Thejas/Documents/PennAppsXV/test/jmackey_enc.jpg", decodeOut, password)
-#     print passwd.decrypt(decodeOut.getvalue(), password)
-# except Exception as e:
-#     print "Wrong password."
-#     print e
-#     sys.exit(1)
-
-# decodeOut.close()
