@@ -3,7 +3,7 @@ import requests
 import json
 import pyotp
 import string
-#import cStringIO
+import cStringIO
 from PIL import Image
 from steg import steg
 from auth import password as passwd
@@ -79,10 +79,7 @@ def code():
   error = None
   if request.method == 'POST':
     code = request.form['2fa']
-    print("moomoo")
     #twoFactor.verify(code)
-    #print(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"))
-    print(password)
     jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password, phone)
     steg.encode("/Users/juliahou/Documents/painting.jpeg", jdata, output="/Users/juliahou/Documents/painting-enc.jpeg", password = password)
     return render_template('download.html')
@@ -99,23 +96,41 @@ info = ''
 @app.route('/retrieval', methods=['GET', 'POST'])
 def retrieval():
   if request.method == 'POST':
+
     if 'file' not in request.files:
       flash('No file part')
       return render_template('retrieval.html')
+
     file = request.files['file']
+
     if file.filename == '':
       flash('No selected file')
       return render_template('retrieval.html')
+
     #if allowed_file(file.filename):
     filename = secure_filename(file.filename)
     path = '/Users/juliahou/Documents'
     file.save(os.path.join(path, filename))
-    global output
+
+    decodeOut = cStringIO.StringIO()
     output = open('file.txt', 'w+')
+
     global password
     password = passwd.getPassword(request.form['password'])
-    steg.decode(os.path.join(path, filename), output, password)
-    passwd.decrypt(output.read(), password)
+    steg.decode(os.path.join(path, filename), decodeOut, password)
+    output.write(passwd.decrypt(decodeOut.getvalue(), password))
+    #passwd.decrypt(output.read(), password)
+    output.close()
+    return render_template('2fa1.html')
+
+@app.route('/2fa-decrypt', methods=['GET','POST'])
+def decrypt_2fa():
+  error = None
+  if request.method == 'POST':
+    code = request.form['2fa']
+    #twoFactor.verify(code)
+    return render_template('info.html')
+  return render_template('2fa1.html')
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
