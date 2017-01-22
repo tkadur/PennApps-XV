@@ -25,6 +25,13 @@ def do2FAVer():
     if not twoFactor.verify(int(raw_input("Enter the 2FA code: "))):
         sys.exit(1)
 
+def isPhone(enc):
+  enc = base64.b64decode(enc)
+  hasPhone = enc[16]
+  if hasPhone != "0":
+    return True
+  return False
+
 def decrypt(enc, key, verification = None):
     enc = base64.b64decode(enc)
     iv = enc[:16]

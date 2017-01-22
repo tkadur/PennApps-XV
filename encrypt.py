@@ -10,7 +10,7 @@ from auth import password as passwd
 from auth import twoFactor
 from werkzeug import secure_filename
 import convert
-from flask import Flask, flash, redirect, render_template, request, session, abort, send_file
+from flask import Flask, flash, redirect, render_template, request, session, abort, send_file, Response
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -161,7 +161,12 @@ def retrieval():
     output.write(passwd.decrypt(decodeOut.getvalue(), password))
     #passwd.decrypt(output.read(), password)
     output.close()
-    return render_template('2fa1.html')
+    if passwd.isPhone(decodeOut.getvalue()):
+      return render_template('2fa1.html')
+    else:
+      output = open('file.txt', 'r')
+      content = output.read()
+      return render_template('info.html', content=content)
 
 @app.route('/2fa-decrypt', methods=['GET','POST'])
 def decrypt_2fa():
@@ -169,8 +174,16 @@ def decrypt_2fa():
   if request.method == 'POST':
     code = request.form['2fa']
     #twoFactor.verify(code)
-    return render_template('info.html')
+    output = open('file.txt', 'r')
+    content = output.read()
+    return render_template('info.html', content=content)
   return render_template('2fa1.html')
+
+@app.route('/info', methods=['GET', 'POST'])
+def info():
+  output = open('file.txt', 'r')
+  content = output.read()
+
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
