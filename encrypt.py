@@ -62,7 +62,7 @@ def upload():
     filename = secure_filename(file.filename)
 
     #if allowed_file(file.filename):
-    path = '.'
+    path = 'test'
     filepath = os.path.join(path, filename)
     file.save(filepath)
 
@@ -84,8 +84,8 @@ def login():
     if 'login' in request.form:
 
       if 'accountID' in request.form:
-        global filepath
-        filepath = getInfo(request.form['accountID'], 'customers')
+        global data
+        data = getInfo(request.form['accountID'], 'customers')
 
       global password
       password = passwd.getPassword(request.form['password'])
@@ -96,12 +96,12 @@ def login():
       return render_template('create_account.html')
   return render_template('login.html', error=error)
 
-'''@app.route('/capone-login',methods=['GET','POST'])
+"""@app.route('/capone-login',methods=['GET','POST'])
 def capone_login():
   error=None
   if request.method == 'POST':
     global data
-    data = getInfo(reqest.form['accountID'], 'customers')
+    data = getInfo(request.form['accountID'], 'customers')
 
     global password
     password=passwd.getPassword(request.form['password'])
@@ -109,7 +109,7 @@ def capone_login():
     flash('You were logged in')
     return render_template('phone.html')
   return render_template('login.html', error=error)
-'''
+"""
 
 hotp = pyotp.HOTP(pyotp.random_base32())
 hotpCount = 1
@@ -131,22 +131,22 @@ def code():
     code = request.form['2fa']
     twoFactor.verify(code)
     jdata = passwd.encrypt(data, password, phone)
-    steg.encode("./painting.jpeg", jdata, output="./painting-enc.jpeg", password = password)
+    steg.encode("test/painting.jpeg", jdata, output="test/painting-enc.jpeg", password = password)
     return render_template('download.html')
   return render_template('phone.html')
 
 @app.route('/no-2fa-encrypt', methods=['GET', 'POST'])
 def no_code():
-  if request.method == 'POST':
+  if True:#request.method == 'POST':
     jdata = passwd.encrypt(data, password)
-    steg.encode("./painting.jpeg", jdata, output="./painting-enc.jpeg", password=password)
+    steg.encode("test/painting.jpeg", jdata, output="test/painting-enc.jpeg", password=password)
     return render_template('download.html')
   return render_template('phone.html')
 
 @app.route('/return-files')
 def return_files():
   try:
-    return send_file("./painting-enc.jpeg", attachment_filename="painting-enc.jpeg")
+    return send_file("test/painting-enc.jpeg", attachment_filename="download.jpeg", as_attachment = True, mimetype = "image/jpeg")
   except Exception as e:
     return str(e)
 
@@ -167,7 +167,7 @@ def retrieval():
 
     #if allowed_file(file.filename):
     filename = secure_filename(file.filename)
-    path = '.'
+    path = 'test'
     file.save(os.path.join(path, filename))
 
     decodeOut = cStringIO.StringIO()
@@ -236,7 +236,7 @@ def getInfo(id, type):
   response = requests.get(url, id)
   with open('file.txt','w') as outfile:
     json.dump(response.json(), outfile)
-  path = '.'
+  path = 'test'
   filepath = os.path.join(path, 'file.txt')
   #return filepath
   return str(response.json())

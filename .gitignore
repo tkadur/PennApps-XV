@@ -89,5 +89,5 @@ ENV/
 .ropeproject
 
 .DS_Store
-test/
+#test/
 *.swp
