@@ -1,12 +1,16 @@
 <link rel="stylesheet" href="/static/style.css" type="text/css">
-<form action="http://localhost:5000/uploader" method="POST" enctype="multipart/form-data">
+<form action="/retrieval" method="POST" enctype="multipart/form-data">
   <div class="login">
     <div class="login-screen">
       <div class="app-title">
-        <h1>Upload your encrypted image</h1>
+        <h1>Sign in using your encrypted image and password</h1>
       </div>
       <div class="login-form">
         <div class="control-group">
+          <input type="text" class="login-field" placeholder="password"  name="password"/>
+          <label class="login-field-icon fui-user" for="password"></label>
+        </div>
+        </div class="control-group">
           <input type="file" class="login-field" name="file"/>
           <label class="login-field-icon fui-user" for="retrieval"></label>
         </div>

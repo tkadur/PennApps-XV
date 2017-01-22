@@ -1,13 +1,16 @@
+import os
 import requests
 import json
 import pyotp
 import string
 #import cStringIO
+from PIL import Image
 from steg import steg
 from auth import password as passwd
 from auth import twoFactor
+from werkzeug import secure_filename
 import convert
-from flask import Flask, flash, redirect, render_template, request, session, abort
+from flask import Flask, flash, redirect, render_template, request, session, abort, send_file
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -92,6 +95,7 @@ def return_files():
   except Exception as e:
     return str(e)
 
+info = ''
 @app.route('/retrieval', methods=['GET', 'POST'])
 def retrieval():
   if request.method == 'POST':
@@ -102,10 +106,16 @@ def retrieval():
     if file.filename == '':
       flash('No selected file')
       return render_template('retrieval.html')
-    if allowed_file(file.filename):
-      filename = secure_filename(file.filename)
-      file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-      return redirect(url_for('uploaded_file', filename=filename))
+    #if allowed_file(file.filename):
+    filename = secure_filename(file.filename)
+    path = '/Users/juliahou/Documents'
+    file.save(os.path.join(path, filename))
+    global output
+    output = open('file.txt', 'w+')
+    global password
+    password = passwd.getPassword(request.form['password'])
+    steg.decode(os.path.join(path, filename), output, password)
+    passwd.decrypt(output.read(), password)
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
