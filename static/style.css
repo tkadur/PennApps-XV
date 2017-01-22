@@ -87,3 +87,9 @@ x-sizing: border-box;
     background: url(loadingimage.gif) no-repeat;
     cursor: wait;
   }
+
+  .content {
+    margin: auto;
+    text: center;
+    text-color: white;
+  }

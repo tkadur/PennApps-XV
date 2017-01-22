@@ -1,12 +1,20 @@
 <!doctype html>
 <link rel="stylesheet" href="/static/style.css" type="text/css">
+{% block body %}
+{% if session['logged_in'] %}
+<p>You're logged in already!</p>
+{% else %}
 <form action="/login" method="POST">
   <div class="login">
     <div class="login-screen">
       <div class="app-title">
-        <h1>Enter a password for encryption</h1>
+        <h1>Login</h1>
       </div>
       <div class="login-form">
+        <div class="control-group">
+          <input type="text" class="login-field" value="" placeholder="account ID" name="accountID">
+          <label class="login-field-icon fui-user" for="accountID"></label>
+        </div>
 
         <div class="control-group">
           <input type="password" class="login-field" value="" placeholder="password" name="password">
@@ -15,7 +23,11 @@
 
         <input type="submit" name='login' value="Log in" class="btn btn-primary btn-large btn-block">
         <br>
+        <input type="submit" name='register' value="Register for an account" class="btn btn-primary btn-large btn-block">
+        <br>
       </div>
     </div>
   </div>
 </form>
+{% endif %}
+{% endblock %}

@@ -32,30 +32,62 @@ def home():
 def option():
   if request.method == 'POST':
     if 'store' in request.form:
-      return render_template('login.html')
+      return render_template('upload.html')
+    elif 'capone' in request.form:
+      return render_template('capone-login.html')
     else:
       return render_template('retrieval.html')
   return home();
 
-password = ''
+filepath = ''
+@app.route('/upload', methods=['GET', 'POST'])
+def upload():
+  if request.method == 'POST':
+    if 'file' not in request.files:
+      flash('No file part')
+      return render_template('upload.html')
 
+    file = request.files['file']
+
+    if file.filename == '':
+      flash('No selected file')
+      return render_template('upload.html')
+
+    filename = secure_filename(file.filename)
+
+    #if allowed_file(file.filename):
+    path = '/Users/juliahou/Documents'
+    global filepath
+    filepath = os.path.join(path, filename)
+    file.save(filepath)
+
+    extension = os.path.splitext(file.filename)
+    if (extension[1] == '.xlsx'):
+      filepath = convert.xlsx2JSON(filepath)
+    elif (extension[1] != '.json'):
+      flash('Please upload an Excel or JSON file.')
+      return render_template('upload.html')
+
+    return render_template('login.html')
+  return render_template('upload.html')
+
+password = ''
 @app.route('/login', methods=['GET', 'POST'])
 def login():
   error = None
   if request.method == 'POST':
     if 'login' in request.form:
-      #if request.form['accountID'] != app.config['USERNAME']:
-      if request.form['accountID'] != 'meows':
-        error = 'Invalid username'
-      #elif request.form['password'] != app.config['PASSWORD']:
-      elif request.form['password'] != 'meows':
-        error = 'Invalid password'
-      else:
-        global password
-        password = passwd.getPassword(request.form['password'])
-        session['logged_in'] = True
-        flash('You were logged in')
-        return render_template('phone.html')
+      #if 'accountID' in request.form:
+      #  if request.form['accountID'] != 'meows':
+      #    error = 'Invalid account ID'
+      #elif request.form['password'] != 'meows':
+      #  error = 'Invalid password'
+      #else:
+      global password
+      password = passwd.getPassword(request.form['password'])
+      session['logged_in'] = True
+      flash('You were logged in')
+      return render_template('phone.html')
     if 'register' in request.form:
       return render_template('create_account.html')
   return render_template('login.html', error=error)
@@ -82,6 +114,14 @@ def code():
     #twoFactor.verify(code)
     jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password, phone)
     steg.encode("/Users/juliahou/Documents/painting.jpeg", jdata, output="/Users/juliahou/Documents/painting-enc.jpeg", password = password)
+    return render_template('download.html')
+  return render_template('phone.html')
+
+@app.route('/no-2fa-encrypt', methods=['GET', 'POST'])
+def no_code():
+  if request.method == 'POST':
+    jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password)
+    steg.encode("/Users/juliahou/Documents/painting.jpeg", jdata, output="/Users/juliahou/Documents/painting-enc.jpeg", password=password)
     return render_template('download.html')
   return render_template('phone.html')
 
