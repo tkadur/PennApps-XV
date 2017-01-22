@@ -15,6 +15,9 @@ from flask import Flask, flash, redirect, render_template, request, session, abo
 app = Flask(__name__)
 app.secret_key = "super secret key"
 
+filepath = ''
+password = ''
+
 #Web app stuff
 
 @app.route('/')
@@ -39,7 +42,6 @@ def option():
       return render_template('retrieval.html')
   return home();
 
-filepath = ''
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
   if request.method == 'POST':
@@ -56,7 +58,7 @@ def upload():
     filename = secure_filename(file.filename)
 
     #if allowed_file(file.filename):
-    path = '~'
+    path = '.'
     global filepath
     filepath = os.path.join(path, filename)
     file.save(filepath)
@@ -71,18 +73,16 @@ def upload():
     return render_template('login.html')
   return render_template('upload.html')
 
-password = ''
 @app.route('/login', methods=['GET', 'POST'])
 def login():
   error = None
   if request.method == 'POST':
     if 'login' in request.form:
-      #if 'accountID' in request.form:
-      #  if request.form['accountID'] != 'meows':
-      #    error = 'Invalid account ID'
-      #elif request.form['password'] != 'meows':
-      #  error = 'Invalid password'
-      #else:
+
+      if 'accountID' in request.form:
+        global filepath
+        filepath = getInfo(request.form['accountID'], 'customers')
+
       global password
       password = passwd.getPassword(request.form['password'])
       session['logged_in'] = True
@@ -91,6 +91,21 @@ def login():
     if 'register' in request.form:
       return render_template('create_account.html')
   return render_template('login.html', error=error)
+
+'''@app.route('/capone-login',methods=['GET','POST'])
+def capone_login():
+  error=None
+  if request.method == 'POST':
+    global data
+    data = getInfo(reqest.form['accountID'], 'customers')
+
+    global password
+    password=passwd.getPassword(request.form['password'])
+    session["logged_in"]=True
+    flash('You were logged in')
+    return render_template('phone.html')
+  return render_template('login.html', error=error)
+'''
 
 hotp = pyotp.HOTP(pyotp.random_base32())
 hotpCount = 1
@@ -111,23 +126,23 @@ def code():
   if request.method == 'POST':
     code = request.form['2fa']
     twoFactor.verify(code)
-    jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password, phone)
-    steg.encode("~/painting.jpeg", jdata, output="~/painting-enc.jpeg", password = password)
+    jdata = passwd.encrypt(filepath, password, phone)
+    steg.encode("./painting.jpeg", jdata, output="./painting-enc.jpeg", password = password)
     return render_template('download.html')
   return render_template('phone.html')
 
 @app.route('/no-2fa-encrypt', methods=['GET', 'POST'])
 def no_code():
   if request.method == 'POST':
-    jdata = passwd.encrypt(convert.xlsx2JSON("test/SuperSecretInformation.xlsx"), password)
-    steg.encode("~/painting.jpeg", jdata, output="~/painting-enc.jpeg", password=password)
+    jdata = passwd.encrypt(filepath, password)
+    steg.encode("./painting.jpeg", jdata, output="./painting-enc.jpeg", password=password)
     return render_template('download.html')
   return render_template('phone.html')
 
 @app.route('/return-files/')
 def return_files():
   try:
-    return send_file("~/painting-enc.jpeg", attachment_filename="painting-enc.jpeg")
+    return send_file("./painting-enc.jpeg", attachment_filename="painting-enc.jpeg")
   except Exception as e:
     return str(e)
 
@@ -148,7 +163,7 @@ def retrieval():
 
     #if allowed_file(file.filename):
     filename = secure_filename(file.filename)
-    path = '~'
+    path = '.'
     file.save(os.path.join(path, filename))
 
     decodeOut = cStringIO.StringIO()
@@ -215,7 +230,14 @@ def logout():
 def getInfo(id, type):
   url = 'http://api.reimaginebanking.com/enterprise/' + type + '/' + id + '?key=89aa70192f549a177bab372469a7c78a'
   response = requests.get(url, id)
-  return response.json()
+  with open('data.txt','w') as outfile:
+    json.dump(response.json(), outfile)
+  path = '.'
+  global filepath
+  filepath = os.path.join(path, 'data.txt')
+  #f.save(filepath)
+
+  return filepath
 
 account = {
     "first_name": "Erin",
