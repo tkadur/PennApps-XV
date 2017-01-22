@@ -139,7 +139,7 @@ def no_code():
     return render_template('download.html')
   return render_template('phone.html')
 
-@app.route('/return-files/')
+@app.route('/return-files')
 def return_files():
   try:
     return send_file("./painting-enc.jpeg", attachment_filename="painting-enc.jpeg")
@@ -230,14 +230,12 @@ def logout():
 def getInfo(id, type):
   url = 'http://api.reimaginebanking.com/enterprise/' + type + '/' + id + '?key=89aa70192f549a177bab372469a7c78a'
   response = requests.get(url, id)
-  with open('data.txt','w') as outfile:
+  with open('file.txt','w') as outfile:
     json.dump(response.json(), outfile)
   path = '.'
-  global filepath
-  filepath = os.path.join(path, 'data.txt')
-  #f.save(filepath)
-
-  return filepath
+  filepath = os.path.join(path, 'file.txt')
+  #return filepath
+  return str(response.json())
 
 account = {
     "first_name": "Erin",
