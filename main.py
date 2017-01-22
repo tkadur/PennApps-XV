@@ -56,7 +56,11 @@ if __name__ == '__main__':
             jdata = None
 
             if raw_input("Do you want 2-factor authentication with a phone? (y/N) ").lower() == "y":
-                jdata = passwd.encrypt(data, password, raw_input("Enter your phone number: "))
+                phone = raw_input("Enter your phone number: ")
+                jdata = passwd.encrypt(data, password, phone)
+                twoFactor.send2AFMessage(phone)
+                if not twoFactor.verify(int(raw_input("Enter the 2FA code: "))):
+                    sys.exit(1)
             else:
                 jdata = passwd.encrypt(data, password)
 
@@ -69,7 +73,7 @@ if __name__ == '__main__':
 
             try:
                 steg.decode(options.image, decodeOut, password)
-                output.write(passwd.decrypt(decodeOut.getvalue(), password))
+                output.write(passwd.decrypt(decodeOut.getvalue(), password, passwd.do2FAVer))
             except Exception as e:
                 print "Wrong password."
                 sys.exit(1)

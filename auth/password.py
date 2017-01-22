@@ -21,7 +21,11 @@ def encrypt(raw, key, phone = None):
     else:
         return base64.b64encode(iv + "1" + phone + cipher.encrypt( raw ))
 
-def decrypt(enc, key):
+def do2FAVer():
+    if not twoFactor.verify(int(raw_input("Enter the 2FA code: "))):
+        sys.exit(1)
+
+def decrypt(enc, key, verification = None):
     enc = base64.b64decode(enc)
     iv = enc[:16]
     phoneEnd = -1
@@ -33,7 +37,7 @@ def decrypt(enc, key):
             phoneEnd = 27
         phone = enc[17:phoneEnd]
         twoFactor.send2FAMessage(phone)
-        # TODO Go to 2FA code entry page
+        verification != None and verification()
     else:
         phoneEnd = 17;
 
