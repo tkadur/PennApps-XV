@@ -31,7 +31,7 @@ def option():
     if 'store' in request.form:
       return render_template('login.html')
     else:
-      return render_template('retrieve.html')
+      return render_template('retrieval.html')
   return home();
 
 password = ''
@@ -91,6 +91,21 @@ def return_files():
     return send_file("/Users/juliahou/Documents/painting-enc.jpeg", attachment_filename="painting-enc.jpeg")
   except Exception as e:
     return str(e)
+
+@app.route('/retrieval', methods=['GET', 'POST'])
+def retrieval():
+  if request.method == 'POST':
+    if 'file' not in request.files:
+      flash('No file part')
+      return render_template('retrieval.html')
+    file = request.files['file']
+    if file.filename == '':
+      flash('No selected file')
+      return render_template('retrieval.html')
+    if allowed_file(file.filename):
+      filename = secure_filename(file.filename)
+      file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+      return redirect(url_for('uploaded_file', filename=filename))
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
