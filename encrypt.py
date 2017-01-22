@@ -42,6 +42,7 @@ def option():
       return render_template('retrieval.html')
   return home();
 
+data = ""
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
   if request.method == 'POST':
@@ -59,17 +60,17 @@ def upload():
 
     #if allowed_file(file.filename):
     path = '.'
-    global filepath
     filepath = os.path.join(path, filename)
     file.save(filepath)
 
+    global data
     extension = os.path.splitext(file.filename)
     if (extension[1] == '.xlsx'):
-      filepath = convert.xlsx2JSON(filepath)
-    elif (extension[1] != '.json'):
-      flash('Please upload an Excel or JSON file.')
-      return render_template('upload.html')
-
+      data = convert.xlsx2JSON(filepath)
+    elif (extension[1] == '.csv'):
+      data = convert.csv2JSON(filepath)
+    else:
+      data = open(filepath, "rb").read()
     return render_template('login.html')
   return render_template('upload.html')
 
