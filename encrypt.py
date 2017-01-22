@@ -12,7 +12,10 @@ from werkzeug import secure_filename
 import convert
 from flask import Flask, flash, redirect, render_template, request, session, abort, send_file, Response
 import logging
+import sys
 
+reload(sys)
+sys.setdefaultencoding('utf8')
 logging.basicConfig(format="%(message)s", level = logging.INFO)
 
 app = Flask(__name__)
@@ -46,12 +49,26 @@ def option():
   return home();
 
 data = ""
+photoFilename = ""
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
   if request.method == 'POST':
     if 'file' not in request.files:
       flash('No file part')
       return render_template('upload.html')
+
+    file = request.files['image']
+    if file.filename == '':
+      flash('no selected image')
+      return render_template('upload.html')
+
+    filename = secure_filename(file.filename)
+    path = 'test'
+    filepath = os.path.join(path, filename)
+    file.save(filepath)
+    global photoFilename
+    photoFilename = filepath
+    print photoFilename
 
     file = request.files['file']
 
@@ -65,6 +82,10 @@ def upload():
     path = 'test'
     filepath = os.path.join(path, filename)
     file.save(filepath)
+    print filepath
+    if 'image' not in request.files:
+      flash('No image part')
+      return render_template('upload.html')
 
     global data
     extension = os.path.splitext(file.filename)
@@ -74,6 +95,7 @@ def upload():
       data = convert.csv2JSON(filepath)
     else:
       data = open(filepath, "rb").read()
+    print data
     return render_template('login.html')
   return render_template('upload.html')
 
@@ -98,7 +120,7 @@ def login():
 
 """@app.route('/capone-login',methods=['GET','POST'])
 def capone_login():
-  error=None
+  error=None8
   if request.method == 'POST':
     global data
     data = getInfo(request.form['accountID'], 'customers')
@@ -131,7 +153,7 @@ def code():
     code = request.form['2fa']
     twoFactor.verify(code)
     jdata = passwd.encrypt(data, password, phone)
-    steg.encode("test/painting.jpeg", jdata, output="test/painting-enc.jpeg", password = password)
+    steg.encode(photoFilename, jdata, output="test/download.jpeg", password = password)
     return render_template('download.html')
   return render_template('phone.html')
 
@@ -139,18 +161,19 @@ def code():
 def no_code():
   if True:#request.method == 'POST':
     jdata = passwd.encrypt(data, password)
-    steg.encode("test/painting.jpeg", jdata, output="test/painting-enc.jpeg", password=password)
+    steg.encode(photoFilename, jdata, output="test/download.jpeg", password=password)
     return render_template('download.html')
   return render_template('phone.html')
 
 @app.route('/return-files')
 def return_files():
   try:
-    return send_file("test/painting-enc.jpeg", attachment_filename="download.jpeg", as_attachment = True, mimetype = "image/jpeg")
+    return send_file("test/download.jpeg", attachment_filename="download.jpeg", as_attachment = True, mimetype = "image/jpeg")
   except Exception as e:
     return str(e)
 
 info = ''
+outfile = None
 @app.route('/retrieval', methods=['GET', 'POST'])
 def retrieval():
   if request.method == 'POST':
@@ -171,7 +194,9 @@ def retrieval():
     file.save(os.path.join(path, filename))
 
     decodeOut = cStringIO.StringIO()
-    output = open('file.txt', 'w+')
+    global outfile
+    outfile = request.form["filename"] or "download.txt"
+    output = open(outfile, 'w+')
 
     global password
     password = passwd.getPassword(request.form['password'])
@@ -182,9 +207,10 @@ def retrieval():
     if passwd.isPhone(decodeOut.getvalue()):
       return render_template('2fa1.html')
     else:
-      output = open('file.txt', 'r')
+      output = open(outfile, 'r')
       content = output.read()
-      return render_template('info.html', content=content)
+      return send_file(outfile, attachment_filename=outfile, as_attachment = True)
+      #return render_template('info.html', content=content)
 
 @app.route('/2fa-decrypt', methods=['GET','POST'])
 def decrypt_2fa():
@@ -192,14 +218,14 @@ def decrypt_2fa():
   if request.method == 'POST':
     code = request.form['2fa']
     twoFactor.verify(code)
-    output = open('file.txt', 'r')
+    output = open(outfile, 'r')
     content = output.read()
-    return render_template('info.html', content=content)
+    return send_file(outfile, attachment_filename=outfile, as_attachment = True)
   return render_template('2fa1.html')
 
 @app.route('/info', methods=['GET', 'POST'])
 def info():
-  output = open('file.txt', 'r')
+  output = open(outfile, 'r')
   content = output.read()
 
 

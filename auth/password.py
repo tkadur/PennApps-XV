@@ -19,7 +19,9 @@ def encrypt(raw, key, phone = None):
     if phone == None:
         return base64.b64encode(iv + "0" + cipher.encrypt(raw))
     else:
-        return base64.b64encode(iv + "1" + phone + cipher.encrypt( raw ))
+        print type(phone)
+        print type(iv)
+        return base64.b64encode(iv + "1" + phone.encode("ascii", "ignore") + cipher.encrypt( raw ))
 
 def do2FAVer():
     if not twoFactor.verify(int(raw_input("Enter the 2FA code: "))):
