@@ -11,6 +11,9 @@ from auth import twoFactor
 from werkzeug import secure_filename
 import convert
 from flask import Flask, flash, redirect, render_template, request, session, abort, send_file, Response
+import logging
+
+logging.basicConfig(format="%(message)s", level = logging.INFO)
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -127,7 +130,7 @@ def code():
   if request.method == 'POST':
     code = request.form['2fa']
     twoFactor.verify(code)
-    jdata = passwd.encrypt(filepath, password, phone)
+    jdata = passwd.encrypt(data, password, phone)
     steg.encode("./painting.jpeg", jdata, output="./painting-enc.jpeg", password = password)
     return render_template('download.html')
   return render_template('phone.html')
@@ -135,7 +138,7 @@ def code():
 @app.route('/no-2fa-encrypt', methods=['GET', 'POST'])
 def no_code():
   if request.method == 'POST':
-    jdata = passwd.encrypt(filepath, password)
+    jdata = passwd.encrypt(data, password)
     steg.encode("./painting.jpeg", jdata, output="./painting-enc.jpeg", password=password)
     return render_template('download.html')
   return render_template('phone.html')
